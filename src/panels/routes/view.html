@@ -1,0 +1,37 @@
+<table class="table table-bordered table-striped panel-routes-table">
+    <tbody>
+    <thead>
+    <tr>
+        <th>Route Name</th>
+        <th>Route Object</th>
+    </tr>
+    </thead>
+    </tbody>
+</table>
+<script>
+    (function () {
+        if (collectors[currentDebugSession] !== undefined) {
+            render();
+        } else {
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'json';
+            xhr.open('GET', targetHost + '/debug/view/' + currentDebugSession, true);
+            xhr.send();
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    collectors[currentDebugSession] = xhr.response.data;
+                } else {
+
+                }
+            };
+        }
+
+        function render() {
+            let routes = collectors[currentDebugSession]["Yiisoft\\Yii\\Debug\\Collector\\RouterCollector"].routes;
+            for (let route in routes) {
+                document.querySelector('.panel-routes-table tbody').insertAdjacentHTML('beforeend',
+                    '<tr><td>' + route + '</td><td>' + routes[route] + '</td></tr>');
+            }
+        }
+    })();
+</script>
