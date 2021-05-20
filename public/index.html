@@ -69,8 +69,9 @@
                     panelLinks[i].classList.remove('active');
                 }
                 event.target.classList.add('active');
+                target = targetHost === '' ? location.protocol + '//' + location.host : targetHost;
                 const xhr = new XMLHttpRequest();
-                xhr.open('GET', event.target.href + '?targetHost=' + targetHost + '&session=' + currentDebugSession );
+                xhr.open('GET', targetPanelsHost + event.target.getAttribute("href") + '?targetHost=' + target + '&session=' + currentDebugSession );
                 xhr.send();
                 xhr.onload = () => {
                     if (xhr.status === 200) {
@@ -96,10 +97,9 @@
                 };
             }
             if (event.target.matches('.connect-target-host')) {
-                //event.preventDefault();
                 let input = document.querySelector('.target-host');
                 document.querySelector(".router-view").innerHTML = '';
-                targetHost = input.value;
+                targetHost = input.value.replace(/\/+$/g, '');
 
                 loadDebugData();
             }
@@ -197,7 +197,7 @@
             let panel = document.querySelector(".panels");
             for (let id in panels) {
                 panel.insertAdjacentHTML('beforeend',
-                    '<a class="list-group-item list-group-item-action panel-link" href="' + targetPanelsHost + panels[id].route + '">' + panels[id].name + '</a>');
+                    '<a class="list-group-item list-group-item-action panel-link" href="' + panels[id].route + '">' + panels[id].name + '</a>');
             }
             panel.classList.remove('d-none');
         }
