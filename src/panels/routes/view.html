@@ -21,9 +21,10 @@
                 if (xhr.status === 200) {
                     collectors[currentDebugSession] = xhr.response.data;
                 } else {
-
+                    document.querySelector(".router-view").innerHTML = 'An error occurred during loading panel "Routes"';
                 }
             };
+            xhr.onload = () => document.querySelector(".router-view").innerHTML = 'An error occurred during loading panel "Routes"';
         }
 
         function render() {
