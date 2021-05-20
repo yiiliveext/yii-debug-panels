@@ -34,7 +34,9 @@
         <div class="card col">
             <div class="card-body">
                 <div class="router-view">
-
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -75,7 +77,7 @@
                     '</div>';
                 target = targetHost === '' ? location.protocol + '//' + location.host : targetHost;
                 const xhr = new XMLHttpRequest();
-                xhr.open('GET', targetPanelsHost + event.target.getAttribute("href") + '?targetHost=' + target + '&session=' + currentDebugSession );
+                xhr.open('GET', targetPanelsHost + event.target.getAttribute("href") + '?targetHost=' + target + '&session=' + currentDebugSession);
                 xhr.send();
                 xhr.onload = () => {
                     if (xhr.status === 200) {
@@ -104,7 +106,10 @@
                 let input = document.querySelector('.target-host');
                 document.querySelector(".router-view").innerHTML = '';
                 targetHost = input.value.replace(/\/+$/g, '');
-
+                document.querySelector(".router-view").innerHTML =
+                    '<div class="spinner-border text-primary" role="status">\n' +
+                    '  <span class="visually-hidden">Loading...</span>\n' +
+                    '</div>';
                 loadDebugData();
             }
         });
@@ -204,6 +209,7 @@
 
         function populatePanels(panels) {
             let panel = document.querySelector(".panels");
+            panel.innerHTML = '';
             for (let id in panels) {
                 panel.insertAdjacentHTML('beforeend',
                     '<a class="list-group-item list-group-item-action panel-link" href="' + panels[id].route + '">' + panels[id].name + '</a>');
@@ -223,6 +229,10 @@
         }
 
         function getCollectors(debugSessionId, onsuccess) {
+            if (collectors[currentDebugSession] !== undefined) {
+                onsuccess();
+                return;
+            }
             const xhr = new XMLHttpRequest();
             xhr.responseType = 'json';
             xhr.open('GET', targetHost + '/debug/view/' + debugSessionId, true);
