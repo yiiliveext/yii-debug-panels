@@ -88,12 +88,18 @@
                             div.removeChild(scripts[i]);
                         }
                         document.querySelector(".router-view").innerHTML = '';
-                        document.querySelector(".router-view").appendChild(div);
+
                         for (let i = 0; i < scripts.length; i++) {
                             let script = document.createElement('script');
-                            script.innerHTML = scripts[i].innerHTML;
-                            document.querySelector(".router-view").appendChild(script);
+                            if (scripts[i].src !== '') {
+                                script.src = scripts[i].src;
+                            } else {
+                                script.innerHTML = 'setTimeout(() => {\n' + scripts[i].innerHTML + '}, 100);\n';
+
+                            }
+                            div.appendChild(script);
                         }
+                        document.querySelector(".router-view").appendChild(div);
                         event.target.disabled = false;
                     } else {
                         event.target.disabled = false;
