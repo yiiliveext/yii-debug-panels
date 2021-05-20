@@ -54,13 +54,13 @@
     </div>
 </main>
 <script>
-    let targetHost = '';
-    let targetPanelsHost = '';
-    let debugSessions;
     let currentDebugSession;
     let collectors = [];
 
     (() => {
+        let targetHost = '';
+        let targetPanelsHost = '';
+        let debugSessions;
 
         document.addEventListener('click', event => {
             if (event.target.matches('.panel-link')) {
