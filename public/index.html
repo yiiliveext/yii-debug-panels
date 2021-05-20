@@ -69,6 +69,10 @@
                     panelLinks[i].classList.remove('active');
                 }
                 event.target.classList.add('active');
+                document.querySelector(".router-view").innerHTML =
+                    '<div class="spinner-border text-primary" role="status">\n' +
+                    '  <span class="visually-hidden">Loading...</span>\n' +
+                    '</div>';
                 target = targetHost === '' ? location.protocol + '//' + location.host : targetHost;
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', targetPanelsHost + event.target.getAttribute("href") + '?targetHost=' + target + '&session=' + currentDebugSession );
@@ -77,12 +81,11 @@
                     if (xhr.status === 200) {
                         let div = document.createElement('div');
                         div.innerHTML = xhr.responseText;
-
                         let scripts = div.querySelectorAll('script');
-                        document.querySelector(".router-view").innerHTML = '';
                         for (let i = 0; i < scripts.length; i++) {
                             div.removeChild(scripts[i]);
                         }
+                        document.querySelector(".router-view").innerHTML = '';
                         document.querySelector(".router-view").appendChild(div);
                         for (let i = 0; i < scripts.length; i++) {
                             let script = document.createElement('script');
@@ -143,6 +146,7 @@
                 if (xhr.status === 200) {
                     populatePanels(xhr.response);
                     document.querySelector(".panel-link").click();
+
                 } else {
                     targetPanelsHost = targetHost;
                     const xhr = new XMLHttpRequest();
@@ -178,6 +182,10 @@
 
         let select = document.querySelector('.debug-sessions');
         select.addEventListener('change', (event) => {
+            document.querySelector(".router-view").innerHTML =
+                '<div class="spinner-border text-primary" role="status">\n' +
+                '  <span class="visually-hidden">Loading...</span>\n' +
+                '</div>';
             currentDebugSession = event.target.value;
             populateDebugSessionInfo();
             getCollectors(currentDebugSession, () => document.querySelector('.panel-link.active').click());
