@@ -12,30 +12,10 @@
 
 <script>
     (function () {
-        if (collectors[currentDebugSession] !== undefined) {
-            render();
-        } else {
-            const xhr = new XMLHttpRequest();
-            xhr.responseType = 'json';
-            xhr.open('GET', targetHost + '/debug/view/' + currentDebugSession, true);
-            xhr.send();
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    collectors[currentDebugSession] = xhr.response.data;
-                    render();
-                } else {
-                    document.querySelector(".router-view").innerHTML = 'An error occurred during loading panel "Info"';
-                }
-            };
-            xhr.onload = () => document.querySelector(".router-view").innerHTML = 'An error occurred during loading panel "Info"';
-        }
-
-        function render() {
-            let appInfo = collectors[currentDebugSession]["Yiisoft\\Yii\\Debug\\Collector\\WebAppInfoCollector"]
-            for (let info in appInfo) {
-                document.querySelector('.panel-info-table tbody').insertAdjacentHTML('beforeend',
-                    '<tr><td>' + info + '</td><td>' + appInfo[info] + '</td></tr>');
-            }
+        let appInfo = collectors[currentDebugSession]["Yiisoft\\Yii\\Debug\\Collector\\WebAppInfoCollector"]
+        for (let info in appInfo) {
+            document.querySelector('.panel-info-table tbody').insertAdjacentHTML('beforeend',
+                '<tr><td>' + info + '</td><td>' + appInfo[info] + '</td></tr>');
         }
     })();
 </script>

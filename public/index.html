@@ -121,8 +121,7 @@
                     debugSessions = sessions.data
                     currentDebugSession = debugSessions[0].id;
                     populateDebugSessions();
-                    getCollectors(currentDebugSession);
-                    getPanels();
+                    getCollectors(currentDebugSession, () => getPanels());
                 } else {
                     document.querySelector(".router-view").innerHTML = 'Debug info not found on target host';
                     document.querySelector(".enter-target-host").classList.remove('d-none');
@@ -177,14 +176,15 @@
             }
         }
 
+        let select = document.querySelector('.debug-sessions');
+        select.addEventListener('change', (event) => {
+            currentDebugSession = event.target.value;
+            populateDebugSessionInfo();
+            getCollectors(currentDebugSession, () => document.querySelector('.panel-link.active').click());
+
+        });
+
         function populateDebugSessions() {
-            let select = document.querySelector('.debug-sessions');
-            select.addEventListener('change', (event) => {
-                currentDebugSession = event.target.value;
-                document.querySelector('.panel-link.active').click();
-                populateDebugSessionInfo();
-                getCollectors();
-            });
             debugSessions.forEach((session) => {
                 let date = new Date(session.timestamp * 1000).toLocaleString("en-US");
                 select.insertAdjacentHTML('beforeend',
@@ -212,11 +212,9 @@
             sessionInfo.insertAdjacentHTML('beforeend', '<span class="px-2">Memory: <span class="badge bg-info">' + session.memory + '</span></span>');
             sessionInfo.insertAdjacentHTML('beforeend', '<span class="px-2">Status: <span class="badge bg-success">' + session.responseStatusCode + '</span></span>');
             sessionInfo.insertAdjacentHTML('beforeend', '<span class="px-2">Ajax: <span class="badge bg-warning">' + session.requestIsAjax + '</span></span>');
-
-
         }
 
-        function getCollectors(debugSessionId) {
+        function getCollectors(debugSessionId, onsuccess) {
             const xhr = new XMLHttpRequest();
             xhr.responseType = 'json';
             xhr.open('GET', targetHost + '/debug/view/' + debugSessionId, true);
@@ -224,9 +222,12 @@
             xhr.onload = () => {
                 if (xhr.status === 200) {
                     collectors[currentDebugSession] = xhr.response.data;
+                    onsuccess();
+                } else {
+                    document.querySelector(".router-view").innerHTML = 'An error occurred during loading collectors';
                 }
             };
-            xhr.onload = () => document.querySelector(".router-view").innerHTML = 'An error occurred during loading collectors';
+            xhr.onerror = () => document.querySelector(".router-view").innerHTML = 'An error occurred during loading collectors';
         }
 
     })();

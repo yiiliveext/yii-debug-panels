@@ -10,29 +10,10 @@
 </table>
 <script>
     (function () {
-        if (collectors[currentDebugSession] !== undefined) {
-            render();
-        } else {
-            const xhr = new XMLHttpRequest();
-            xhr.responseType = 'json';
-            xhr.open('GET', targetHost + '/debug/view/' + currentDebugSession, true);
-            xhr.send();
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    collectors[currentDebugSession] = xhr.response.data;
-                } else {
-                    document.querySelector(".router-view").innerHTML = 'An error occurred during loading panel "Routes"';
-                }
-            };
-            xhr.onload = () => document.querySelector(".router-view").innerHTML = 'An error occurred during loading panel "Routes"';
-        }
-
-        function render() {
-            let routes = collectors[currentDebugSession]["Yiisoft\\Yii\\Debug\\Collector\\RouterCollector"].routes;
-            for (let route in routes) {
-                document.querySelector('.panel-routes-table tbody').insertAdjacentHTML('beforeend',
-                    '<tr><td>' + route + '</td><td>' + routes[route] + '</td></tr>');
-            }
+        let routes = collectors[currentDebugSession]["Yiisoft\\Yii\\Debug\\Collector\\RouterCollector"].routes;
+        for (let route in routes) {
+            document.querySelector('.panel-routes-table tbody').insertAdjacentHTML('beforeend',
+                '<tr><td>' + route + '</td><td>' + routes[route] + '</td></tr>');
         }
     })();
 </script>
