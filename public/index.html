@@ -76,6 +76,23 @@
                     '  <span class="visually-hidden">Loading...</span>\n' +
                     '</div>';
                 target = targetHost === '' ? location.protocol + '//' + location.host : targetHost;
+
+                const loadScripts = (scripts, div) => {
+                    const script = scripts.shift();
+                    if (script) {
+                        const element = document.createElement('script');
+                        element.onload = () => loadScripts(scripts, div);
+
+                        if (script.src !== '') {
+                            element.src = script.src;
+                        } else {
+                            element.innerHTML = script.innerHTML;
+                        }
+
+                        div.appendChild(element);
+                    }
+                };
+
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', targetPanelsHost + event.target.getAttribute("href") + '?targetHost=' + target + '&session=' + currentDebugSession);
                 xhr.send();
@@ -88,17 +105,7 @@
                             div.removeChild(scripts[i]);
                         }
                         document.querySelector(".router-view").innerHTML = '';
-
-                        for (let i = 0; i < scripts.length; i++) {
-                            let script = document.createElement('script');
-                            if (scripts[i].src !== '') {
-                                script.src = scripts[i].src;
-                            } else {
-                                script.innerHTML = 'setTimeout(() => {\n' + scripts[i].innerHTML + '}, 100);\n';
-
-                            }
-                            div.appendChild(script);
-                        }
+                        loadScripts(Array.from(scripts), div);
                         document.querySelector(".router-view").appendChild(div);
                         event.target.disabled = false;
                     } else {
