@@ -77,22 +77,6 @@
                     '</div>';
                 target = targetHost === '' ? location.protocol + '//' + location.host : targetHost;
 
-                const loadScripts = (scripts, div) => {
-                    const script = scripts.shift();
-                    if (script) {
-                        const element = document.createElement('script');
-                        element.onload = () => loadScripts(scripts, div);
-
-                        if (script.src !== '') {
-                            element.src = script.src;
-                        } else {
-                            element.innerHTML = script.innerHTML;
-                        }
-
-                        div.appendChild(element);
-                    }
-                };
-
                 const xhr = new XMLHttpRequest();
                 xhr.open('GET', targetPanelsHost + event.target.getAttribute("href") + '?targetHost=' + target + '&session=' + currentDebugSession);
                 xhr.send();
@@ -105,7 +89,17 @@
                             div.removeChild(scripts[i]);
                         }
                         document.querySelector(".router-view").innerHTML = '';
-                        loadScripts(Array.from(scripts), div);
+                        for (let i = 0; i < scripts.length; i++) {
+                            let script = document.createElement('script');
+                            script.async = false
+                            if (scripts[i].src !== '') {
+                                script.src = scripts[i].src;
+                            } else {
+                                script.defer = true
+                                script.src = `data:text/javascript;base64, ${btoa(scripts[i].innerHTML)}`;
+                            }
+                            div.appendChild(script);
+                        }
                         document.querySelector(".router-view").appendChild(div);
                         event.target.disabled = false;
                     } else {
